@@ -1,0 +1,54 @@
+#!/usr/bin/env python
+# coding: utf-8
+import numpy as np
+#BP神经网络的输入
+X = np.array([[1,0,0],
+              [1,0,1],
+              [1,1,0],
+              [1,1,1]])
+#标记
+Y = np.array([[0,1,1,0]])
+
+#隐层权值，输出层权值，这里假定有四个隐层神经元，一个输出层神经元
+V = np.random.random((3,4))*2-1
+W = np.random.random((4,1))*2-1
+
+# 定义学习率
+lr = 0.11
+# 定义激活函数以及利用激活函数的性质定义激活函数的导数
+def sigmoid(x) :
+    return 1/(1+np.exp(-x))
+
+def dsigmoid(x) :
+    return x*(1-x)
+
+# 对权值进行更新，具体的公式原理参照课件当中的资料
+def update():
+    global X, Y, W, V, lr
+    # 隐层与输出层的结果
+    L1 = sigmoid(np.dot(X,V))
+    L2 = sigmoid(np.dot(L1,W))
+
+    # 输出误差信号与隐层误差信号
+    # 输出层的误差信号为有四行，每一行都代表一个数据输入后，得到的误差信号
+    # 隐含层的误差信号也是同理
+    L2_delta =(Y.T-L2)*dsigmoid(L2) #列*列=对应位置相乘最后还是列向量
+    L1_delta = np.dot(L2_delta,W.T)*dsigmoid(L1)
+
+    # 求权值的变化量
+    # 这里权值的更新是对所有的样本进行了考量，按理来说这里的权值大小应该要除以样本数量的
+    # 这里权值的变化量并不是很大，因此可以不用除以样本数量
+    W_C = lr*np.dot(L1.T,L2_delta)/int(X.shape[0])
+    V_C = lr*np.dot(X.T,L1_delta)/int(X.shape[0])
+    # W_C = lr * np.dot(L1.T, L2_delta) 这样也可以
+    # V_C = lr * np.dot(X.T, L1_delta)
+    # 更新权值
+    W = W + W_C
+    V = V + V_C
+for i in range(20000) :
+    update()
+
+L1 = sigmoid(np.dot(X,V))
+L2 = sigmoid(np.dot(L1,W))
+print(L2)
+
