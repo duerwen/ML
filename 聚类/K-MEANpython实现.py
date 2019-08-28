@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-data = np.genfromtxt("kmeans.txt",delimiter=",")
+data = np.genfromtxt("kmeans.txt",delimiter=" ")
 
 # 随机生成k个质心
 def initCentroids(data,k) :
@@ -32,21 +32,38 @@ def kmeans(data,k):
             # 计算第i个样本所属类别与离所属类别质心的距离
             for j in range(k) :
                 # 计算第i个样本离第j个质心的距离
-                distance = np.sqrt(np.sum((data[i,:]-Centroids[j,:])**2))
+                distance = np.sqrt(np.sum((data[i,:]-centroids[j,:])**2))
                 if distance < minDistance :
                     minDistance = distance
                     clusterData[i,1] = minDistance
-                    lebel = j
+                    label = j
 
-            # 如果样本所属的类别发生变化，则需要更新质心
+            # 如果样本所属的类别发生变化，则需要更新质心(只要有一个样本的所属类别发生变化就更新质心)
             if clusterData[i,0] != label :
-                clusterData[i,0] = j
-                # 更新质心
-                for j in range(k) :
-                    index = np.nonzero(clusterData[:,0] == j)
-                    # 计算第j类的质心
-                    centroids[j,:] = np.mean(data[index],axis=0)
-
+                clusterData[i,0] = label
                 changeCentroids = True
-
+        # 更新质心
+        for j in range(k) :
+            index = np.nonzero(clusterData[:,0] == j)
+            # 计算第j类的质心
+            centroids[j,:] = np.mean(data[index],axis=0)
     return centroids,clusterData
+
+def showCluster(data,k,centroids,clusterData) :
+    numSample,dim = data.shape
+    maker = ['or', 'ob', 'oy', 'ok', '^r', '+r', 'sr', 'dr', '<r', 'pr']
+    #遍历每个数据,花样本点
+    for i in range(numSample) :
+        plt.plot(data[i,0],data[i,1],maker[int(clusterData[i,0])])
+    #画质心
+    maker = ['*r', '*b', '*y', '*k', '^r', '+r', 'sr', 'dr', '<r', 'pr']
+    for i in range(centroids.shape[0]) :
+        plt.plot(centroids[i,0],centroids[i,1],maker[i],markersize=20)
+
+    plt.show()
+
+
+centroids,clusterData = kmeans(data,4)
+print(centroids)
+showCluster(data,4,centroids,clusterData)
+
