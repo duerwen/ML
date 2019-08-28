@@ -1,10 +1,10 @@
-from sklearn.cluster import KMeans
+from sklearn.cluster import MiniBatchKMeans
 import numpy as np
 import matplotlib.pyplot as plt
 
 data = np.genfromtxt("kmeans.txt",delimiter=" ")
 
-model = KMeans(n_clusters=4)
+model = MiniBatchKMeans(n_clusters=4)
 model.fit(data)
 #打印质心点
 print(model.cluster_centers_)
@@ -35,5 +35,3 @@ for i in range(centroids.shape[0]) :
     plt.plot(centroids[i, 0], centroids[i, 1], maker[i], markersize=20)
 
 plt.show()
-
-
